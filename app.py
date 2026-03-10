@@ -2,58 +2,69 @@ import streamlit as st
 from PIL import Image
 import google.generativeai as genai
 from supabase import create_client, Client
+import PyPDF2
 
 # ==========================================
-# 1. AYARLAR VE TASARIM
+# 1. TEMEL AYARLAR VE TASARIM
 # ==========================================
-st.set_page_config(page_title="Quantis | Universal Solver", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="Quantis AI | Olympiad Level Solver", page_icon="⚡", layout="wide")
 
 st.markdown("""
     <style>
     /* UI ve Branding Gizleme */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
     .viewerBadge_container__1QSob {display: none !important;}
     
-    .stApp { background-color: #0d1117; color: #c9d1d9; }
-    .hero-title { text-align: center; font-size: 3.5rem; font-weight: 800; color: #58a6ff; margin-bottom: 0px; }
-    .hero-sub { text-align: center; font-size: 1.2rem; color: #8b949e; margin-top: 0px; margin-bottom: 30px; }
-    .stButton>button { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); color: white; border-radius: 8px; width: 100%; border:none; padding:12px; font-weight:bold; font-size: 16px; }
+    .stApp { background-color: #0d1117; color: #c9d1d9; font-family: 'Inter', sans-serif; }
+    .hero-title { text-align: center; font-size: 3.2rem; font-weight: 800; color: #58a6ff; margin-bottom: 0px; }
+    .hero-sub { text-align: center; font-size: 1.1rem; color: #8b949e; margin-bottom: 30px; }
+    .stButton>button { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); color: white; border-radius: 8px; width: 100%; border:none; padding:12px; font-weight:bold; }
     .paywall-box { background-color: #21262d; border: 2px solid #58a6ff; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px; }
+    .blur-box { filter: blur(6px); opacity: 0.4; background-color: #161b22; padding: 20px; border-radius: 10px; margin-top: 15px; user-select: none; pointer-events: none; }
     .result-card { background-color: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; margin-top: 15px; }
     </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. KÜRESEL DİL SÖZLÜĞÜ (10 DİL)
+# 2. DİL SÖZLÜĞÜ (YENİ PAZARLAMA STRATEJİSİ EKLENDİ)
 # ==========================================
 T = {
-    "English": {"lang": "English", "hero": "Universal Math & Science Solver", "sub": "Get step-by-step solutions instantly.", "up": "Upload your problem", "btn1": "✨ Generate Solution", "lock": "🔒 Full Solution Locked", "lock_sub": "Create a free account to see the explanation.", "btn2": "🚀 Unlock Full Solution (Free)", "dash": "My Workspace", "btn3": "✨ Detailed Solution (1 Credit)", "err": "0 Credits. Upgrade to Premium.", "dl": "📄 Download Report", "ans": "Answer:"},
-    "Türkçe": {"lang": "Turkish", "hero": "Evrensel Matematik ve Bilim Çözücü", "sub": "Anında adım adım çözüm alın.", "up": "Probleminizi yükleyin", "btn1": "✨ Çözüm Üret", "lock": "🔒 Tam Çözüm Kilitli", "lock_sub": "Açıklamayı görmek için ücretsiz hesap oluşturun.", "btn2": "🚀 Tam Çözümü Aç (Ücretsiz)", "dash": "Çalışma Alanım", "btn3": "✨ Detaylı Çözüm (1 Kredi)", "err": "0 Kredi. Lütfen Premium'a geçin.", "dl": "📄 Raporu İndir", "ans": "Cevap:"},
-    "Español": {"lang": "Spanish", "hero": "Solucionador Universal de Matemáticas", "sub": "Obtén soluciones paso a paso al instante.", "up": "Sube tu problema", "btn1": "✨ Generar Solución", "lock": "🔒 Solución Completa Bloqueada", "lock_sub": "Crea una cuenta gratis para ver la explicación.", "btn2": "🚀 Desbloquear Solución (Gratis)", "dash": "Mi Espacio", "btn3": "✨ Solución Detallada (1 Crédito)", "err": "0 Créditos. Mejora a Premium.", "dl": "📄 Descargar Reporte", "ans": "Respuesta:"},
-    "Deutsch": {"lang": "German", "hero": "Universeller Mathe- & Wissenschaftslöser", "sub": "Erhalten Sie sofort Schritt-für-Schritt-Lösungen.", "up": "Laden Sie Ihr Problem hoch", "btn1": "✨ Lösung Generieren", "lock": "🔒 Vollständige Lösung Gesperrt", "lock_sub": "Konto erstellen, um die Erklärung zu sehen.", "btn2": "🚀 Lösung Entsperren (Kostenlos)", "dash": "Mein Arbeitsbereich", "btn3": "✨ Detaillierte Lösung (1 Credit)", "err": "0 Credits. Bitte auf Premium upgraden.", "dl": "📄 Bericht Herunterladen", "ans": "Antwort:"},
-    "中文": {"lang": "Chinese", "hero": "通用数学与科学求解器", "sub": "立即获取逐步解答。", "up": "上传您的问题", "btn1": "✨ 生成解答", "lock": "🔒 完整解答已锁定", "lock_sub": "创建一个免费账户以查看详细说明。", "btn2": "🚀 解锁完整解答 (免费)", "dash": "我的工作区", "btn3": "✨ 详细解答 (1 积分)", "err": "积分不足，请升级至高级版。", "dl": "📄 下载报告", "ans": "答案:"},
-    "Français": {"lang": "French", "hero": "Solveur Universel de Mathématiques", "sub": "Obtenez des solutions étape par étape instantanément.", "up": "Téléchargez votre problème", "btn1": "✨ Générer la Solution", "lock": "🔒 Solution Complète Verrouillée", "lock_sub": "Créez un compte gratuit pour voir l'explication.", "btn2": "🚀 Débloquer la Solution (Gratuit)", "dash": "Mon Espace", "btn3": "✨ Solution Détaillée (1 Crédit)", "err": "0 Crédits. Passez à Premium.", "dl": "📄 Télécharger le Rapport", "ans": "Réponse:"},
-    "Русский": {"lang": "Russian", "hero": "Универсальный Решатель Задач", "sub": "Получите пошаговые решения мгновенно.", "up": "Загрузите вашу задачу", "btn1": "✨ Сгенерировать Решение", "lock": "🔒 Полное Решение Заблокировано", "lock_sub": "Создайте бесплатный аккаунт, чтобы увидеть объяснение.", "btn2": "🚀 Разблокировать Решение (Бесплатно)", "dash": "Моя Рабочая Область", "btn3": "✨ Подробное Решение (1 Кредит)", "err": "0 Кредитов. Перейдите на Premium.", "dl": "📄 Скачать Отчет", "ans": "Ответ:"},
-    "Português": {"lang": "Portuguese", "hero": "Solucionador Universal de Matemática", "sub": "Obtenha soluções passo a passo instantaneamente.", "up": "Envie seu problema", "btn1": "✨ Gerar Solução", "lock": "🔒 Solução Completa Bloqueada", "lock_sub": "Crie uma conta grátis para ver a explicação.", "btn2": "🚀 Desbloquear Solução (Grátis)", "dash": "Meu Espaço", "btn3": "✨ Solução Detalhada (1 Crédito)", "err": "0 Créditos. Mude para Premium.", "dl": "📄 Baixar Relatório", "ans": "Resposta:"},
-    "日本語": {"lang": "Japanese", "hero": "汎用数学・科学ソルバー", "sub": "ステップバイステップの解答を瞬時に取得します。", "up": "問題をアップロード", "btn1": "✨ 解答を生成", "lock": "🔒 完全な解答はロックされています", "lock_sub": "解説を見るには無料アカウントを作成してください。", "btn2": "🚀 完全な解答をロック解除 (無料)", "dash": "マイワークスペース", "btn3": "✨ 詳細な解答 (1 クレジット)", "err": "クレジットがありません。Premiumにアップグレードしてください。", "dl": "📄 レポートをダウンロード", "ans": "答え:"},
-    "العربية": {"lang": "Arabic", "hero": "الحلال العالمي للرياضيات والعلوم", "sub": "احصل على حلول خطوة بخطوة على الفور.", "up": "قم برفع مسألتك", "btn1": "✨ توليد الحل", "lock": "🔒 الحل الكامل مقفل", "lock_sub": "قم بإنشاء حساب مجاني لرؤية الشرح.", "btn2": "🚀 فتح الحل الكامل (مجاني)", "dash": "مساحة العمل الخاصة بي", "btn3": "✨ حل مفصل (1 رصيد)", "err": "0 رصيد. يرجى الترقية إلى Premium.", "dl": "📄 تحميل التقرير", "ans": "الإجابة:"}
+    "English": {
+        "lang": "English", 
+        "hero": "Solve Engineering Problems with Olympiad-Level Reasoning.", 
+        "sub": "Built by a Top #135 YKS Ranker & TÜBİTAK Math Olympiad Bronze Medalist.<br><i>Get step-by-step solutions instantly.</i>", 
+        "up": "Upload problem (Image)", 
+        "btn1": "✨ Solve Problem (3 Free)", 
+        "lock": "🔒 Step-by-Step Locked", 
+        "lock_sub": "Create a free account to see the Olympiad-level explanation.", 
+        "btn2": "🚀 Claim Your 3 Free Solves"
+    },
+    "Türkçe": {
+        "lang": "Turkish", 
+        "hero": "Mühendislik Sorularını Olimpiyat Seviyesinde Çözün.", 
+        "sub": "Türkiye 135.si ve TÜBİTAK Matematik Olimpiyatı Madalyalısı tarafından geliştirildi.<br><i>Adım adım çözümleri anında görün.</i>", 
+        "up": "Soru yükle (Görsel)", 
+        "btn1": "✨ Soruyu Çöz (3 Ücretsiz)", 
+        "lock": "🔒 Adım Adım Çözüm Kilitli", 
+        "lock_sub": "Olimpiyat seviyesindeki açıklamayı görmek için ücretsiz kayıt ol.", 
+        "btn2": "🚀 3 Ücretsiz Hakkını Al"
+    }
 }
 
 # ==========================================
-# 3. YAN MENÜ VE BAĞLANTILAR (GARANTİLİ MODEL BULUCU EKLENDİ)
+# 3. YAN MENÜ DİL SEÇİMİ
 # ==========================================
 with st.sidebar:
-    st.title("🌐 Global Gateway")
-    lang_choice = st.selectbox("Select Language", list(T.keys()))
+    lang_choice = st.selectbox("🌐 Language", list(T.keys()))
     curr = T[lang_choice]
 
+# ==========================================
+# 4. SİSTEM BAĞLANTILARI (GARANTİLİ MODEL BULUCU)
+# ==========================================
 try:
     supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # 404 HATASINI ÇÖZEN OTOMATİK SİSTEM
     available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
     target_model_name = 'models/gemini-1.5-flash'
     for m_name in available_models:
@@ -61,9 +72,8 @@ try:
             target_model_name = m_name
             break
     model = genai.GenerativeModel(target_model_name)
-    
 except Exception as e:
-    st.error(f"⚠️ Kritik Bağlantı Hatası: {e}")
+    st.error(f"API Error: {e}")
 
 if 'user' not in st.session_state: st.session_state.user = None
 if 'page' not in st.session_state: st.session_state.page = "landing"
@@ -75,37 +85,40 @@ def get_credits(user_id):
         return 3
     return res.data[0]["credits"]
 
+def extract_pdf_text(pdf_file):
+    reader = PyPDF2.PdfReader(pdf_file)
+    return "".join([page.extract_text() for page in reader.pages])
+
 # ==========================================
-# 4. VİTRİN (LANDING PAGE)
+# 5. VİTRİN (LANDING PAGE)
 # ==========================================
 def show_landing():
-    st.markdown("<h1 class='hero-title'>⚡ Quantis</h1>", unsafe_allow_html=True)
-    st.markdown(f"<p class='hero-sub'>{curr['hero']}<br><i>{curr['sub']}</i></p>", unsafe_allow_html=True)
+    st.markdown(f"<h1 class='hero-title'>⚡ Quantis AI</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p class='hero-sub'><b>{curr['hero']}</b><br>{curr['sub']}</p>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         img_file = st.file_uploader(curr["up"], type=['png','jpg','jpeg'])
-        
         if img_file:
-            img = Image.open(img_file)
-            st.image(img, use_container_width=True)
-            
+            st.image(Image.open(img_file), use_container_width=True)
             if st.button(curr["btn1"]):
-                with st.spinner("Analyzing..."):
+                with st.spinner("Analyzing with Olympiad Reasoning..."):
                     try:
-                        prompt = f"Give ONLY the final numerical answer or short result for this problem. No steps. YOU MUST WRITE THE ANSWER IN {curr['lang']} LANGUAGE."
-                        response = model.generate_content([prompt, img])
+                        prompt = f"Give ONLY the final numerical answer or short result. Language: {curr['lang']}."
+                        res = model.generate_content([prompt, Image.open(img_file)])
+                        st.success("Analysis Complete!")
+                        st.markdown(f"<div class='result-card'><h3>Answer: {res.text}</h3></div>", unsafe_allow_html=True)
                         
-                        st.success("Complete!")
-                        st.markdown(f"<div class='result-card'><h3>{curr['ans']} {response.text}</h3></div>", unsafe_allow_html=True)
-                        
-                        st.markdown(f"""
-                        <div class='paywall-box'>
-                            <h2>{curr['lock']}</h2>
-                            <p>{curr['lock_sub']}</p>
-                        </div>
+                        st.markdown("""
+                            <div class='blur-box'>
+                                <p><b>Step 1:</b> Defining the variables and applying the foundational theorem...</p>
+                                <p><b>Step 2:</b> Integrating the function over the given boundaries:</p>
+                                <p>$$ \int_{a}^{b} f(x) dx = F(b) - F(a) $$</p>
+                                <p><b>Step 3:</b> Substituting the values yields the final distribution matrix.</p>
+                            </div>
                         """, unsafe_allow_html=True)
                         
+                        st.markdown(f"<div class='paywall-box'><h2>{curr['lock']}</h2><p>{curr['lock_sub']}</p></div>", unsafe_allow_html=True)
                         if st.button(curr["btn2"]):
                             st.session_state.page = "auth"
                             st.rerun()
@@ -113,7 +126,7 @@ def show_landing():
                         st.error(f"❌ AI Error: {e}")
 
 # ==========================================
-# 5. GİRİŞ VE PANEL EKRANLARI
+# 6. GİRİŞ VE KAYIT EKRANI
 # ==========================================
 def show_auth():
     st.markdown("<h2 style='text-align:center;'>Welcome to Quantis</h2>", unsafe_allow_html=True)
@@ -136,45 +149,79 @@ def show_auth():
                     st.session_state.page = "dashboard"
                     st.rerun()
             except Exception as e:
-                st.error(f"Auth Error: {e}")
+                st.error(f"Error: {e}")
 
+# ==========================================
+# 7. ÇALIŞMA ALANI (DASHBOARD) - TÜM ÖZELLİKLER
+# ==========================================
 def show_dashboard():
-    user = st.session_state.user
-    credits = get_credits(user.id)
+    user_credits = get_credits(st.session_state.user.id)
     
     with st.sidebar:
-        st.title("⚡ Quantis PRO")
-        st.write(f"👤 {user.email}")
-        st.metric("Credits", f"{credits}")
+        st.write("---")
+        st.write(f"👤 **{st.session_state.user.email}**")
+        st.metric("Credits Left", f"{user_credits} ⚡")
         if st.button("Logout"):
             st.session_state.user = None
             st.session_state.page = "landing"
             st.rerun()
 
-    st.title(curr["dash"])
-    if credits > 0:
-        img_file = st.file_uploader(curr["up"], type=['png','jpg','jpeg'])
-        if img_file:
-            img = Image.open(img_file)
-            st.image(img, use_container_width=True)
-            if st.button(curr["btn3"]):
-                with st.spinner("Processing..."):
-                    try:
-                        prompt = f"Act as an expert math and science tutor. Solve this problem step-by-step in extreme detail. YOU MUST WRITE THE ENTIRE EXPLANATION IN {curr['lang']} LANGUAGE."
-                        response = model.generate_content([prompt, img])
-                        
-                        supabase.table("profiles").update({"credits": credits - 1}).eq("id", user.id).execute()
-                        st.markdown(response.text)
-                        st.download_button(curr["dl"], data=response.text, file_name="quantis_solution.txt")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ Error: {e}")
-    else:
-        st.error(curr["err"])
+    st.markdown("<h1 class='hero-title'>My Workspace</h1>", unsafe_allow_html=True)
+    
+    if user_credits <= 0:
+        st.error("0 Credits Remaining.")
+        st.markdown("""
+            <div class='paywall-box'>
+                <h2>🚀 Upgrade to Quantis PRO</h2>
+                <p>• 5 Credits: $2 <br>• 10 Credits: $5 <br>• Unlimited + PDF Tools: $10/mo</p>
+                <a href='https://lemonsqueezy.com' target='_blank'><button style='background-color:#58a6ff; border:none; padding:10px 20px; border-radius:5px; color:black; font-weight:bold; cursor:pointer;'>Purchase Credits</button></a>
+            </div>
+        """, unsafe_allow_html=True)
+        return
+
+    tab1, tab2, tab3 = st.tabs(["📸 Photo Solver", "📄 PDF Exam AI", "🏆 Pro Tutoring"])
+    
+    with tab1:
+        st.subheader("Step-by-Step Solver")
+        img = st.file_uploader("Upload Problem", type=['png','jpg','jpeg'], key="img_dash")
+        if img and st.button("✨ Solve & Explain (1 Credit)"):
+            with st.spinner("Processing..."):
+                prompt = f"Solve this step-by-step as an expert tutor. Language: {curr['lang']}."
+                response = model.generate_content([prompt, Image.open(img)])
+                supabase.table("profiles").update({"credits": user_credits - 1}).eq("id", st.session_state.user.id).execute()
+                st.markdown(f"<div class='result-card'>{response.text}</div>", unsafe_allow_html=True)
+                st.download_button("📄 Download PDF Report", response.text, "quantis_report.txt")
+                st.rerun()
+                
+    with tab2:
+        st.subheader("AI Exam Predictor")
+        st.info("Upload your lecture notes. AI will extract key formulas, predict exam questions, and generate a mini-test.")
+        pdf = st.file_uploader("Upload PDF Notes", type=['pdf'])
+        if pdf and st.button("🧠 Analyze PDF (1 Credit)"):
+            with st.spinner("Reading document and generating predictions..."):
+                text = extract_pdf_text(pdf)
+                prompt = f"Act as a university professor. Based on this text, generate: 1. Key Formulas/Summary. 2. Three Highly Probable Exam Questions. 3. A Mini-Test (Flashcard style). Language: {curr['lang']}.\n\nText: {text[:8000]}"
+                response = model.generate_content(prompt)
+                supabase.table("profiles").update({"credits": user_credits - 1}).eq("id", st.session_state.user.id).execute()
+                st.markdown(f"<div class='result-card'>{response.text}</div>", unsafe_allow_html=True)
+                st.rerun()
+
+    with tab3:
+        st.subheader("Elite 1-on-1 Mentorship")
+        st.markdown("""
+        **Learn from the Best.**
+        Your instructor, Burak, is a **Top 135 YKS Ranker** and a **TUBITAK Math Olympiad Bronze Medalist**.
+        
+        Get exclusive access to:
+        * Advanced Problem Solving Techniques
+        * Olympiad-level Mathematics
+        * Custom Exam Strategy
+        """)
+        st.button("Book a Session (Contact Us)")
 
 # ==========================================
 # AKIŞ KONTROLÜ
 # ==========================================
-if st.session_state.user is not None: show_dashboard()
+if st.session_state.user: show_dashboard()
 elif st.session_state.page == "auth": show_auth()
 else: show_landing()
