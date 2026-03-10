@@ -6,9 +6,9 @@ from PIL import Image
 import google.generativeai as genai
 
 # -- SAYFA AYARLARI --
-st.set_page_config(page_title="Quantis Global | Universal Engineering", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="Quantis Global | Engineering Hub", page_icon="⚡", layout="wide")
 
-# -- API VE OTOMATİK MODEL BULUCU --
+# -- API VE MOTOR AYARLARI --
 model = None
 try:
     if "GEMINI_API_KEY" in st.secrets:
@@ -21,42 +21,28 @@ try:
                 break
         model = genai.GenerativeModel(target_model_name)
     else:
-        st.error("⚠️ API Key bulunamadı!")
+        st.error("⚠️ API Key is missing in Secrets.")
 except Exception as e:
-    st.error(f"⚠️ API Bağlantı Hatası: {e}")
+    st.error(f"⚠️ Connection Error: {e}")
 
-# -- %100 GENİŞLETİLMİŞ DİL SÖZLÜĞÜ --
+# -- DEV KÜRESEL DİL SÖZLÜĞÜ (10 DİL) --
 T = {
-    "English": {
-        "sub": "Universal Engineering Solutions", "tab1": "Manual Entry", "tab2": "Vision (AI)",
-        "in": "Enter Equation:", "mode": "Select Mode:", "modes": ["Derivative", "Integral", "Solve Roots"],
-        "btn": "Analyze", "up": "Upload Problem Photo", 
-        "info": "Quantis Vision: Just upload the problem photo and sit back.",
-        "cap": "Uploaded Image", "solve_btn": "✨ Magic Solve",
-        "spin": "Quantis intelligence is analyzing the problem...",
-        "prompt": "You are an expert math and engineering assistant. Solve the problem in the image step by step, highly detailed, and in clear English. State the final result clearly at the end.",
-        "err_math": "Could not read mathematical expression, please enter in correct format.",
-        "err_api": "Model could not be loaded. Please check your API Key settings.",
-        "err_vis": "❌ Vision Analysis Error:"
-    },
-    "Türkçe": {
-        "sub": "Evrensel Mühendislik Çözümleri", "tab1": "Manuel Giriş", "tab2": "Görüntü (AI)",
-        "in": "Denklemi Girin:", "mode": "İşlem Seçin:", "modes": ["Türev", "İntegral", "Kök Bulma"],
-        "btn": "Analiz Et", "up": "Problem Fotoğrafı Yükle", 
-        "info": "Quantis Vision: Sadece problem fotoğrafını yükleyin ve arkanıza yaslanın.",
-        "cap": "Yüklenen Görsel", "solve_btn": "✨ Sihirli Çözüm",
-        "spin": "Quantis zekası problemi analiz ediyor...",
-        "prompt": "Sen uzman bir matematik ve mühendislik asistanısın. Görseldeki soruyu adım adım, son derece detaylı ve anlaşılır bir Türkçe ile çöz. En son sonucu net bir şekilde belirt.",
-        "err_math": "Matematiksel ifade okunamadı, lütfen doğru formatta girin.",
-        "err_api": "Model yüklenemedi. Lütfen API Key ayarlarınızı kontrol edin.",
-        "err_vis": "❌ Görsel Analiz Hatası:"
-    }
+    "English": {"sub": "Advanced Engineering Solutions", "tab1": "Manual Entry", "tab2": "Quantis Vision", "in": "Enter Equation:", "mode": "Mode:", "modes": ["Derivative", "Integral", "Solve Roots"], "btn": "Analyze", "up": "Upload Problem Photo", "info": "Upload the problem and let Quantis Engine handle the rest.", "solve_btn": "✨ Quantis Solve", "spin": "Quantis is processing...", "lang_code": "English"},
+    "Türkçe": {"sub": "İleri Mühendislik Çözümleri", "tab1": "Manuel Giriş", "tab2": "Quantis Vision", "in": "Denklemi Girin:", "mode": "İşlem:", "modes": ["Türev", "İntegral", "Kök Bulma"], "btn": "Analiz Et", "up": "Problem Fotoğrafı Yükle", "info": "Problemi yükleyin ve Quantis Motoru'na bırakın.", "solve_btn": "✨ Quantis Analiz", "spin": "Quantis işliyor...", "lang_code": "Turkish"},
+    "Deutsch": {"sub": "Fortgeschrittene Ingenieurlösungen", "tab1": "Manuelle Eingabe", "tab2": "Quantis Vision", "in": "Gleichung eingeben:", "mode": "Modus:", "modes": ["Ableitung", "Integral", "Wurzeln lösen"], "btn": "Analysieren", "up": "Problemfoto hochladen", "info": "Laden Sie das Problem hoch, Quantis übernimmt den Rest.", "solve_btn": "✨ Quantis Lösen", "spin": "Quantis verarbeitet...", "lang_code": "German"},
+    "Español": {"sub": "Soluciones de Ingeniería Avanzada", "tab1": "Entrada Manual", "tab2": "Quantis Vision", "in": "Ingrese la ecuación:", "mode": "Modo:", "modes": ["Derivada", "Integral", "Resolver Raíces"], "btn": "Analizar", "up": "Subir Foto del Problema", "info": "Sube el problema y deja que Quantis Engine haga el resto.", "solve_btn": "✨ Resolver con Quantis", "spin": "Quantis está procesando...", "lang_code": "Spanish"},
+    "Français": {"sub": "Solutions d'Ingénierie Avancées", "tab1": "Entrée Manuelle", "tab2": "Quantis Vision", "in": "Entrez l'équation:", "mode": "Mode:", "modes": ["Dérivée", "Intégrale", "Résoudre les Racines"], "btn": "Analyser", "up": "Télécharger la Photo", "info": "Téléchargez le problème, Quantis s'occupe du reste.", "solve_btn": "✨ Résoudre avec Quantis", "spin": "Quantis traite en cours...", "lang_code": "French"},
+    "Português": {"sub": "Soluções de Engenharia Avançada", "tab1": "Entrada Manual", "tab2": "Quantis Vision", "in": "Digite a Equação:", "mode": "Modo:", "modes": ["Derivada", "Integral", "Encontrar Raízes"], "btn": "Analisar", "up": "Enviar Foto do Problema", "info": "Envie o problema e deixe o Quantis Engine resolver.", "solve_btn": "✨ Resolver com Quantis", "spin": "Quantis está processando...", "lang_code": "Portuguese"},
+    "Русский": {"sub": "Передовые Инженерные Решения", "tab1": "Ручной Ввод", "tab2": "Quantis Vision", "in": "Введите уравнение:", "mode": "Режим:", "modes": ["Производная", "Интеграл", "Найти Корни"], "btn": "Анализ", "up": "Загрузить Фото Проблемы", "info": "Загрузите проблему, Quantis сделает остальное.", "solve_btn": "✨ Решить с Quantis", "spin": "Quantis обрабатывает...", "lang_code": "Russian"},
+    "中文": {"sub": "高级工程解决方案", "tab1": "手动输入", "tab2": "Quantis Vision", "in": "输入方程式:", "mode": "模式:", "modes": ["导数", "积分", "求根"], "btn": "分析", "up": "上传问题照片", "info": "上传问题，让 Quantis 引擎来处理。", "solve_btn": "✨ Quantis 解析", "spin": "Quantis 正在处理...", "lang_code": "Chinese"},
+    "日本語": {"sub": "高度なエンジニアリングソリューション", "tab1": "手動入力", "tab2": "Quantis Vision", "in": "方程式を入力:", "mode": "モード:", "modes": ["導関数", "積分", "根を求める"], "btn": "解析する", "up": "問題の写真をアップロード", "info": "問題をアップロードして、Quantisエンジンにお任せください。", "solve_btn": "✨ Quantis 解決", "spin": "Quantisが処理中...", "lang_code": "Japanese"},
+    "العربية": {"sub": "حلول هندسية متقدمة", "tab1": "إدخال يدوي", "tab2": "Quantis Vision", "in": "أدخل المعادلة:", "mode": "الوضع:", "modes": ["مشتق", "تكامل", "حل الجذور"], "btn": "تحليل", "up": "رفع صورة المسألة", "info": "قم برفع المسألة ودع محرك Quantis يتولى الباقي.", "solve_btn": "✨ حل عبر Quantis", "spin": "Quantis يقوم بالمعالجة...", "lang_code": "Arabic"}
 }
 
 # -- YAN MENÜ --
 with st.sidebar:
-    st.title("🌐 Global Gateway")
-    lang_choice = st.selectbox("Language / Dil", list(T.keys()))
+    st.title("🌐 Quantis Settings")
+    lang_choice = st.selectbox("", list(T.keys()))
     current_T = T[lang_choice]
 
 # -- UI STYLING --
@@ -102,7 +88,7 @@ with tab1:
                 ax.grid(alpha=0.2)
                 st.pyplot(fig)
             except:
-                st.error(current_T["err_math"])
+                st.error("Error evaluating expression.")
 
 with tab2:
     st.info(current_T["info"])
@@ -110,20 +96,20 @@ with tab2:
     
     if img_file:
         img = Image.open(img_file)
-        st.image(img, caption=current_T["cap"], use_container_width=True)
+        st.image(img, caption="Quantis Upload", use_container_width=True)
         
         if st.button(current_T["solve_btn"]):
             if model is None:
-                st.error(current_T["err_api"])
+                st.error("Engine offline. Check API Key.")
             else:
                 with st.spinner(current_T["spin"]):
                     try:
-                        # Yapay zekaya verilecek emir, seçilen dile göre dinamik olarak çekiliyor
-                        response = model.generate_content([current_T["prompt"], img])
+                        # DİNAMİK YAPAY ZEKA EMRİ: Seçilen dile göre cevap verir.
+                        prompt = f"You are the Quantis Engineering Engine. Solve the math/engineering problem in the image step by step. Provide a highly detailed and professional solution. YOU MUST WRITE THE ENTIRE RESPONSE IN {current_T['lang_code']}. State the final result clearly."
+                        response = model.generate_content([prompt, img])
                         
                         st.markdown("<div class='result-card'>", unsafe_allow_html=True)
                         st.markdown(response.text)
                         st.markdown("</div>", unsafe_allow_html=True)
                     except Exception as e:
-                        st.error(f"{current_T['err_vis']} {e}")
-
+                        st.error(f"Quantis Engine Error: {e}")
