@@ -51,11 +51,12 @@ T = {
 }
 
 # ==========================================
-# 3. YAN MENÜ DİL SEÇİMİ
+# 3. GÖRÜNÜR DİL SEÇİCİ (SAĞ ÜST KÖŞE)
 # ==========================================
-with st.sidebar:
-    lang_choice = st.selectbox("🌐 Language", list(T.keys()))
-    curr = T[lang_choice]
+col_empty, col_lang = st.columns([4, 1])
+with col_lang:
+    lang_choice = st.selectbox("🌐", list(T.keys()), label_visibility="collapsed")
+curr = T[lang_choice]
 
 # ==========================================
 # 4. SİSTEM BAĞLANTILARI
@@ -89,13 +90,12 @@ def extract_pdf_text(pdf_file):
     return "".join([page.extract_text() for page in reader.pages])
 
 # ==========================================
-# 5. VİTRİN (LANDING PAGE - TÜM ÖZELLİKLER BURADA)
+# 5. VİTRİN (LANDING PAGE)
 # ==========================================
 def show_landing():
     st.markdown(f"<h1 class='hero-title'>⚡ Quantis AI</h1>", unsafe_allow_html=True)
     st.markdown(f"<p class='hero-sub'><b>{curr['hero']}</b><br>{curr['sub']}</p>", unsafe_allow_html=True)
     
-    # ANA SAYFADA MÜŞTERİYİ İKNA EDECEK 3 SEKME
     tab1, tab2, tab3 = st.tabs(["📸 Photo Solver", "📄 PDF Exam AI", "🏆 1-on-1 Mentorship"])
     
     with tab1:
@@ -187,7 +187,7 @@ def show_auth():
                 st.error(f"Error: {e}")
 
 # ==========================================
-# 7. ÇALIŞMA ALANI (DASHBOARD) - ÜYE GİRİŞİ YAPILDIĞINDA
+# 7. ÇALIŞMA ALANI (DASHBOARD)
 # ==========================================
 def show_dashboard():
     user_credits = get_credits(st.session_state.user.id)
