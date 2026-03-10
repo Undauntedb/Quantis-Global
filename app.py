@@ -32,7 +32,7 @@ T = {
         "in": "Enter Equation:", "mode": "Select Mode:", "modes": ["Derivative", "Integral", "Solve Roots"],
         "btn": "Analyze", "up": "Upload Problem Photo", 
         "info": "Quantis Vision: Just upload the problem photo and sit back.",
-        "cap": "Uploaded Image", "solve_btn": "✨ Magic Solve (AI)",
+        "cap": "Uploaded Image", "solve_btn": "✨ Magic Solve",
         "spin": "Quantis intelligence is analyzing the problem...",
         "prompt": "You are an expert math and engineering assistant. Solve the problem in the image step by step, highly detailed, and in clear English. State the final result clearly at the end.",
         "err_math": "Could not read mathematical expression, please enter in correct format.",
@@ -44,7 +44,7 @@ T = {
         "in": "Denklemi Girin:", "mode": "İşlem Seçin:", "modes": ["Türev", "İntegral", "Kök Bulma"],
         "btn": "Analiz Et", "up": "Problem Fotoğrafı Yükle", 
         "info": "Quantis Vision: Sadece problem fotoğrafını yükleyin ve arkanıza yaslanın.",
-        "cap": "Yüklenen Görsel", "solve_btn": "✨ Yapay Zeka ile Çöz",
+        "cap": "Yüklenen Görsel", "solve_btn": "✨ Sihirli Çözüm",
         "spin": "Quantis zekası problemi analiz ediyor...",
         "prompt": "Sen uzman bir matematik ve mühendislik asistanısın. Görseldeki soruyu adım adım, son derece detaylı ve anlaşılır bir Türkçe ile çöz. En son sonucu net bir şekilde belirt.",
         "err_math": "Matematiksel ifade okunamadı, lütfen doğru formatta girin.",
@@ -126,3 +126,4 @@ with tab2:
                         st.markdown("</div>", unsafe_allow_html=True)
                     except Exception as e:
                         st.error(f"{current_T['err_vis']} {e}")
+
