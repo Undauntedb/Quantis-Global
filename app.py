@@ -7,7 +7,8 @@ import PyPDF2
 # ==========================================
 # 1. TEMEL AYARLAR VE TASARIM
 # ==========================================
-st.set_page_config(page_title="Quantis AI | Olympiad Level Solver", page_icon="⚡", layout="wide")
+# initial_sidebar_state="expanded" ile sol menünün bilgisayarda hep açık kalmasını sağlıyoruz.
+st.set_page_config(page_title="Quantis AI | Olympiad Level Solver", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
     <style>
@@ -28,27 +29,28 @@ st.markdown("""
 # 2. GLOBAL DİL SÖZLÜĞÜ (12 DİL)
 # ==========================================
 T = {
-    "English": {"lang": "English", "hero": "Solve Engineering Problems with Olympiad-Level Reasoning.", "sub": "Built by a Top #135 YKS Ranker & TÜBİTAK Math Olympiad Bronze Medalist.<br><i>Your ultimate academic weapon.</i>", "up": "Upload problem (Image)", "btn1": "✨ Solve Problem (Free Preview)", "lock": "🔒 Pro Features Locked", "lock_sub": "Create a free account to unlock step-by-step reasoning, PDF Exam Predictor, and Mentorship.", "btn2": "🚀 Create Free Account"},
-    "Türkçe": {"lang": "Turkish", "hero": "Mühendislik Sorularını Olimpiyat Seviyesinde Çözün.", "sub": "Türkiye 135.si ve TÜBİTAK Matematik Olimpiyatı Madalyalısı tarafından geliştirildi.<br><i>En güçlü akademik asistanınız.</i>", "up": "Soru yükle (Görsel)", "btn1": "✨ Soruyu Çöz (Ücretsiz Önizleme)", "lock": "🔒 Pro Özellikler Kilitli", "lock_sub": "Adım adım çözümleri, PDF Sınav Tahmincisini ve Mentorluğu açmak için ücretsiz kayıt ol.", "btn2": "🚀 Ücretsiz Hesap Oluştur"},
-    "Español": {"lang": "Spanish", "hero": "Resuelve Problemas de Ingeniería con Razonamiento de Nivel Olímpico.", "sub": "Creado por un Medallista de Bronce en la Olimpiada de Matemáticas.<br><i>Tu arma académica definitiva.</i>", "up": "Sube tu problema (Imagen)", "btn1": "✨ Resolver Problema (Vista Previa)", "lock": "🔒 Funciones Pro Bloqueadas", "lock_sub": "Crea una cuenta gratuita para desbloquear el razonamiento paso a paso, el predictor de exámenes PDF y la mentoría.", "btn2": "🚀 Crear Cuenta Gratis"},
-    "Deutsch": {"lang": "German", "hero": "Lösen Sie Ingenieurprobleme mit Argumentation auf Olympiade-Niveau.", "sub": "Entwickelt von einem Bronzemedaillengewinner der Mathematik-Olympiade.<br><i>Ihre ultimative akademische Waffe.</i>", "up": "Problem hochladen (Bild)", "btn1": "✨ Problem lösen (Kostenlose Vorschau)", "lock": "🔒 Pro-Funktionen Gesperrt", "lock_sub": "Erstellen Sie ein kostenloses Konto, um schrittweise Erklärungen, PDF-Prüfungsvorhersagen und Mentoring freizuschalten.", "btn2": "🚀 Kostenloses Konto Erstellen"},
-    "Français": {"lang": "French", "hero": "Résolvez des Problèmes d'Ingénierie avec un Raisonnement de Niveau Olympique.", "sub": "Créé par un Médaillé de Bronze aux Olympiades de Mathématiques.<br><i>Votre arme académique ultime.</i>", "up": "Téléchargez le problème (Image)", "btn1": "✨ Résoudre le Problème (Aperçu)", "lock": "🔒 Fonctionnalités Pro Verrouillées", "lock_sub": "Créez un compte gratuit pour débloquer les étapes, le prédicteur d'examen PDF et le mentorat.", "btn2": "🚀 Créer un Compte Gratuit"},
-    "中文": {"lang": "Chinese", "hero": "以奥林匹克级别的推理解决工程问题。", "sub": "由数学奥林匹克铜牌得主打造。<br><i>你的终极学术武器。</i>", "up": "上传问题（图片）", "btn1": "✨ 解决问题（免费预览）", "lock": "🔒 专业功能已锁定", "lock_sub": "创建一个免费账户即可解锁详细步骤、PDF考试预测和导师辅导。", "btn2": "🚀 创建免费账户"},
-    "Русский": {"lang": "Russian", "hero": "Решайте Инженерные Задачи с Логикой Олимпиадного Уровня.", "sub": "Создано бронзовым призером Олимпиады по математике.<br><i>Ваше главное академическое оружие.</i>", "up": "Загрузите задачу (Изображение)", "btn1": "✨ Решить Задачу (Бесплатный предпросмотр)", "lock": "🔒 Pro-функции Заблокированы", "lock_sub": "Создайте бесплатный аккаунт, чтобы получить пошаговые решения, PDF-прогнозы экзаменов и наставничество.", "btn2": "🚀 Создать Бесплатный Аккаунт"},
-    "Português": {"lang": "Portuguese", "hero": "Resolva Problemas de Engenharia com Raciocínio de Nível Olímpico.", "sub": "Criado por um Medalhista de Bronze na Olimpíada de Matemática.<br><i>Sua arma acadêmica definitiva.</i>", "up": "Envie o problema (Imagem)", "btn1": "✨ Resolver Problema (Prévia)", "lock": "🔒 Recursos Pro Bloqueados", "lock_sub": "Crie uma conta gratuita para desbloquear soluções passo a passo, o Previsor de Exames PDF e a Mentoria.", "btn2": "🚀 Criar Conta Grátis"},
-    "العربية": {"lang": "Arabic", "hero": "حل المشاكل الهندسية بتفكير على مستوى الأولمبياد.", "sub": "تم بناؤه بواسطة حائز على الميدالية البرونزية في أولمبياد الرياضيات.<br><i>سلاحك الأكاديمي النهائي.</i>", "up": "ارفع المشكلة (صورة)", "btn1": "✨ حل المشكلة (معاينة مجانية)", "lock": "🔒 الميزات الاحترافية مقفلة", "lock_sub": "قم بإنشاء حساب مجاني لفتح الحلول خطوة بخطوة، وتوقع امتحانات PDF، والإرشاد.", "btn2": "🚀 إنشاء حساب مجاني"},
-    "日本語": {"lang": "Japanese", "hero": "オリンピックレベルの推論で工学の問題を解決します。", "sub": "数学オリンピックの銅メダリストによって構築されました。<br><i>究極の学術兵器。</i>", "up": "問題をアップロード (画像)", "btn1": "✨ 問題を解決 (無料プレビュー)", "lock": "🔒 プロ機能がロックされています", "lock_sub": "無料アカウントを作成して、ステップバイステップの解説、PDF試験予測、メンターシップのロックを解除してください。", "btn2": "🚀 無料アカウントを作成"},
-    "हिन्दी": {"lang": "Hindi", "hero": "ओलंपियाड स्तर के तर्क के साथ इंजीनियरिंग समस्याओं को हल करें।", "sub": "गणित ओलंपियाड के कांस्य पदक विजेता द्वारा निर्मित।<br><i>आपका अंतिम शैक्षणिक हथियार।</i>", "up": "समस्या अपलोड करें (छवि)", "btn1": "✨ समस्या हल करें (मुफ्त पूर्वावलोकन)", "lock": "🔒 प्रो सुविधाएँ लॉक हैं", "lock_sub": "चरण-दर-चरण स्पष्टीकरण, पीडीएफ परीक्षा भविष्यवक्ता और मेंटरशिप को अनलॉक करने के लिए एक निःशुल्क खाता बनाएं।", "btn2": "🚀 मुफ़्त खाता बनाएँ"},
-    "Italiano": {"lang": "Italian", "hero": "Risolvi Problemi di Ingegneria con un Ragionamento di Livello Olimpico.", "sub": "Creato da una Medaglia di Bronzo alle Olimpiadi della Matematica.<br><i>La tua arma accademica definitiva.</i>", "up": "Carica il problema (Immagine)", "btn1": "✨ Risolvi Problema (Anteprima)", "lock": "🔒 Funzionalità Pro Bloccate", "lock_sub": "Crea un account gratuito per sbloccare i passaggi, il previsore di esami PDF e il tutoraggio.", "btn2": "🚀 Crea Account Gratuito"}
+    "English": {"lang": "English", "hero": "Solve Engineering Problems with Olympiad-Level Reasoning.", "sub": "Built by a Top #135 YKS Ranker & TÜBİTAK Math Olympiad Bronze Medalist.<br><i>Your ultimate academic weapon.</i>", "up": "Upload problem (Image)", "btn1": "✨ Solve Problem (Free Preview)", "lock": "🔒 Pro Features Locked", "lock_sub": "Create a free account to unlock step-by-step reasoning, PDF Exam Predictor, and Mentorship.", "btn2": "🚀 Create Free Account", "dash": "My Workspace"},
+    "Türkçe": {"lang": "Turkish", "hero": "Mühendislik Sorularını Olimpiyat Seviyesinde Çözün.", "sub": "Türkiye 135.si ve TÜBİTAK Matematik Olimpiyatı Madalyalısı tarafından geliştirildi.<br><i>En güçlü akademik asistanınız.</i>", "up": "Soru yükle (Görsel)", "btn1": "✨ Soruyu Çöz (Ücretsiz Önizleme)", "lock": "🔒 Pro Özellikler Kilitli", "lock_sub": "Adım adım çözümleri, PDF Sınav Tahmincisini ve Mentorluğu açmak için ücretsiz kayıt ol.", "btn2": "🚀 Ücretsiz Hesap Oluştur", "dash": "Çalışma Alanım"},
+    "Español": {"lang": "Spanish", "hero": "Resuelve Problemas de Ingeniería con Razonamiento de Nivel Olímpico.", "sub": "Creado por un Medallista de Bronce en la Olimpiada de Matemáticas.<br><i>Tu arma académica definitiva.</i>", "up": "Sube tu problema (Imagen)", "btn1": "✨ Resolver Problema (Vista Previa)", "lock": "🔒 Funciones Pro Bloqueadas", "lock_sub": "Crea una cuenta gratuita para desbloquear el razonamiento paso a paso, el predictor de exámenes PDF y la mentoría.", "btn2": "🚀 Crear Cuenta Gratis", "dash": "Mi Espacio"},
+    "Deutsch": {"lang": "German", "hero": "Lösen Sie Ingenieurprobleme mit Argumentation auf Olympiade-Niveau.", "sub": "Entwickelt von einem Bronzemedaillengewinner der Mathematik-Olympiade.<br><i>Ihre ultimative akademische Waffe.</i>", "up": "Problem hochladen (Bild)", "btn1": "✨ Problem lösen (Kostenlose Vorschau)", "lock": "🔒 Pro-Funktionen Gesperrt", "lock_sub": "Erstellen Sie ein kostenloses Konto, um schrittweise Erklärungen, PDF-Prüfungsvorhersagen und Mentoring freizuschalten.", "btn2": "🚀 Kostenloses Konto Erstellen", "dash": "Mein Arbeitsbereich"},
+    "Français": {"lang": "French", "hero": "Résolvez des Problèmes d'Ingénierie avec un Raisonnement de Niveau Olympique.", "sub": "Créé par un Médaillé de Bronze aux Olympiades de Mathématiques.<br><i>Votre arme académique ultime.</i>", "up": "Téléchargez le problème (Image)", "btn1": "✨ Résoudre le Problème (Aperçu)", "lock": "🔒 Fonctionnalités Pro Verrouillées", "lock_sub": "Créez un compte gratuit pour débloquer les étapes, le prédicteur d'examen PDF et le mentorat.", "btn2": "🚀 Créer un Compte Gratuit", "dash": "Mon Espace"},
+    "中文": {"lang": "Chinese", "hero": "以奥林匹克级别的推理解决工程问题。", "sub": "由数学奥林匹克铜牌得主打造。<br><i>你的终极学术武器。</i>", "up": "上传问题（图片）", "btn1": "✨ 解决问题（免费预览）", "lock": "🔒 专业功能已锁定", "lock_sub": "创建一个免费账户即可解锁详细步骤、PDF考试预测和导师辅导。", "btn2": "🚀 创建免费账户", "dash": "我的工作区"},
+    "Русский": {"lang": "Russian", "hero": "Решайте Инженерные Задачи с Логикой Олимпиадного Уровня.", "sub": "Создано бронзовым призером Олимпиады по математике.<br><i>Ваше главное академическое оружие.</i>", "up": "Загрузите задачу (Изображение)", "btn1": "✨ Решить Задачу (Бесплатный предпросмотр)", "lock": "🔒 Pro-функции Заблокированы", "lock_sub": "Создайте бесплатный аккаунт, чтобы получить пошаговые решения, PDF-прогнозы экзаменов и наставничество.", "btn2": "🚀 Создать Бесплатный Аккаунт", "dash": "Моя Рабочая Область"},
+    "Português": {"lang": "Portuguese", "hero": "Resolva Problemas de Engenharia com Raciocínio de Nível Olímpico.", "sub": "Criado por um Medalhista de Bronze na Olimpíada de Matemática.<br><i>Sua arma acadêmica definitiva.</i>", "up": "Envie o problema (Imagem)", "btn1": "✨ Resolver Problema (Prévia)", "lock": "🔒 Recursos Pro Bloqueados", "lock_sub": "Crie uma conta gratuita para desbloquear soluções passo a passo, o Previsor de Exames PDF e a Mentoria.", "btn2": "🚀 Criar Conta Grátis", "dash": "Meu Espaço"},
+    "العربية": {"lang": "Arabic", "hero": "حل المشاكل الهندسية بتفكير على مستوى الأولمبياد.", "sub": "تم بناؤه بواسطة حائز على الميدالية البرونزية في أولمبياد الرياضيات.<br><i>سلاحك الأكاديمي النهائي.</i>", "up": "ارفع المشكلة (صورة)", "btn1": "✨ حل المشكلة (معاينة مجانية)", "lock": "🔒 الميزات الاحترافية مقفلة", "lock_sub": "قم بإنشاء حساب مجاني لفتح الحلول خطوة بخطوة، وتوقع امتحانات PDF، والإرشاد.", "btn2": "🚀 إنشاء حساب مجاني", "dash": "مساحة العمل الخاصة بي"},
+    "日本語": {"lang": "Japanese", "hero": "オリンピックレベルの推論で工学の問題を解決します。", "sub": "数学オリンピックの銅メダリストによって構築されました。<br><i>究極の学術兵器。</i>", "up": "問題をアップロード (画像)", "btn1": "✨ 問題を解決 (無料プレビュー)", "lock": "🔒 プロ機能がロックされています", "lock_sub": "無料アカウントを作成して、ステップバイステップの解説、PDF試験予測、メンターシップのロックを解除してください。", "btn2": "🚀 無料アカウントを作成", "dash": "マイワークスペース"},
+    "हिन्दी": {"lang": "Hindi", "hero": "ओलंपियाड स्तर के तर्क के साथ इंजीनियरिंग समस्याओं को हल करें।", "sub": "गणित ओलंपियाड के कांस्य पदक विजेता द्वारा निर्मित।<br><i>आपका अंतिम शैक्षणिक हथियार।</i>", "up": "समस्या अपलोड करें (छवि)", "btn1": "✨ समस्या हल करें (मुफ्त पूर्वावलोकन)", "lock": "🔒 प्रो सुविधाएँ लॉक हैं", "lock_sub": "चरण-दर-चरण स्पष्टीकरण, पीडीएफ परीक्षा भविष्यवक्ता और मेंटरशिप को अनलॉक करने के लिए एक निःशुल्क खाता बनाएं।", "btn2": "🚀 मुफ़्त खाता बनाएँ", "dash": "मेरा कार्यक्षेत्र"},
+    "Italiano": {"lang": "Italian", "hero": "Risolvi Problemi di Ingegneria con un Ragionamento di Livello Olimpico.", "sub": "Creato da una Medaglia di Bronzo alle Olimpiadi della Matematica.<br><i>La tua arma accademica definitiva.</i>", "up": "Carica il problema (Immagine)", "btn1": "✨ Risolvi Problema (Anteprima)", "lock": "🔒 Funzionalità Pro Bloccate", "lock_sub": "Crea un account gratuito per sbloccare i passaggi, il previsore di esami PDF e il tutoraggio.", "btn2": "🚀 Crea Account Gratuito", "dash": "Il mio spazio di lavoro"}
 }
 
 # ==========================================
-# 3. GÖRÜNÜR DİL SEÇİCİ (TAM ORTADA)
+# 3. SOL MENÜ (SİDEBAR) VE DİL SEÇİMİ (KESİN ÇÖZÜM)
 # ==========================================
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    lang_choice = st.selectbox("🌐 Select Language / Dil Seçin", list(T.keys()))
-curr = T[lang_choice]
+with st.sidebar:
+    st.markdown("### 🌐 Settings / Ayarlar")
+    lang_choice = st.selectbox("Language / Dil", list(T.keys()))
+    curr = T[lang_choice]
+    st.divider()
 
 # ==========================================
 # 4. SİSTEM BAĞLANTILARI
@@ -82,7 +84,20 @@ def extract_pdf_text(pdf_file):
     return "".join([page.extract_text() for page in reader.pages])
 
 # ==========================================
-# 5. VİTRİN (LANDING PAGE - TÜM ÖZELLİKLER BURADA)
+# EĞER GİRİŞ YAPILDIYSA SOL MENÜYE KULLANICI BİLGİLERİNİ EKLE
+# ==========================================
+if st.session_state.user:
+    with st.sidebar:
+        user_credits = get_credits(st.session_state.user.id)
+        st.write(f"👤 **{st.session_state.user.email}**")
+        st.metric("Credits Left", f"{user_credits} ⚡")
+        if st.button("Logout"):
+            st.session_state.user = None
+            st.session_state.page = "landing"
+            st.rerun()
+
+# ==========================================
+# 5. VİTRİN (LANDING PAGE)
 # ==========================================
 def show_landing():
     st.markdown(f"<h1 class='hero-title'>⚡ Quantis AI</h1>", unsafe_allow_html=True)
@@ -179,21 +194,13 @@ def show_auth():
                 st.error(f"Error: {e}")
 
 # ==========================================
-# 7. ÇALIŞMA ALANI (DASHBOARD) - ÜYE GİRİŞİ YAPILDIĞINDA
+# 7. ÇALIŞMA ALANI (DASHBOARD)
 # ==========================================
 def show_dashboard():
-    user_credits = get_credits(st.session_state.user.id)
+    st.markdown(f"<h1 class='hero-title'>{curr['dash']}</h1>", unsafe_allow_html=True)
     
-    with st.sidebar:
-        st.write("---")
-        st.write(f"👤 **{st.session_state.user.email}**")
-        st.metric("Credits Left", f"{user_credits} ⚡")
-        if st.button("Logout"):
-            st.session_state.user = None
-            st.session_state.page = "landing"
-            st.rerun()
-
-    st.markdown("<h1 class='hero-title'>My Workspace</h1>", unsafe_allow_html=True)
+    # Kullanıcı kredisini get_credits ile sidebar tarafında çektik, tekrar kullanıyoruz
+    user_credits = get_credits(st.session_state.user.id)
     
     if user_credits <= 0:
         st.error("0 Credits Remaining.")
