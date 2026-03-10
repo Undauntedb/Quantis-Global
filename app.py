@@ -11,7 +11,6 @@ st.set_page_config(page_title="Quantis AI | Olympiad Level Solver", page_icon="�
 
 st.markdown("""
     <style>
-    /* UI ve Branding Gizleme */
     #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
     .viewerBadge_container__1QSob {display: none !important;}
     
@@ -26,28 +25,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. DİL SÖZLÜĞÜ (YENİ PAZARLAMA STRATEJİSİ EKLENDİ)
+# 2. DİL SÖZLÜĞÜ (OLİMPİYAT VİZYONU)
 # ==========================================
 T = {
     "English": {
         "lang": "English", 
         "hero": "Solve Engineering Problems with Olympiad-Level Reasoning.", 
-        "sub": "Built by a Top #135 YKS Ranker & TÜBİTAK Math Olympiad Bronze Medalist.<br><i>Get step-by-step solutions instantly.</i>", 
+        "sub": "Built by a Top #135 YKS Ranker & TÜBİTAK Math Olympiad Bronze Medalist.<br><i>Your ultimate academic weapon.</i>", 
         "up": "Upload problem (Image)", 
-        "btn1": "✨ Solve Problem (3 Free)", 
-        "lock": "🔒 Step-by-Step Locked", 
-        "lock_sub": "Create a free account to see the Olympiad-level explanation.", 
-        "btn2": "🚀 Claim Your 3 Free Solves"
+        "btn1": "✨ Solve Problem (Free Preview)", 
+        "lock": "🔒 Pro Features Locked", 
+        "lock_sub": "Create a free account to unlock step-by-step reasoning, PDF Exam Predictor, and Mentorship.", 
+        "btn2": "🚀 Create Free Account"
     },
     "Türkçe": {
         "lang": "Turkish", 
         "hero": "Mühendislik Sorularını Olimpiyat Seviyesinde Çözün.", 
-        "sub": "Türkiye 135.si ve TÜBİTAK Matematik Olimpiyatı Madalyalısı tarafından geliştirildi.<br><i>Adım adım çözümleri anında görün.</i>", 
+        "sub": "Türkiye 135.si ve TÜBİTAK Matematik Olimpiyatı Madalyalısı tarafından geliştirildi.<br><i>En güçlü akademik asistanınız.</i>", 
         "up": "Soru yükle (Görsel)", 
-        "btn1": "✨ Soruyu Çöz (3 Ücretsiz)", 
-        "lock": "🔒 Adım Adım Çözüm Kilitli", 
-        "lock_sub": "Olimpiyat seviyesindeki açıklamayı görmek için ücretsiz kayıt ol.", 
-        "btn2": "🚀 3 Ücretsiz Hakkını Al"
+        "btn1": "✨ Soruyu Çöz (Ücretsiz Önizleme)", 
+        "lock": "🔒 Pro Özellikler Kilitli", 
+        "lock_sub": "Adım adım çözümleri, PDF Sınav Tahmincisini ve Mentorluğu açmak için ücretsiz kayıt ol.", 
+        "btn2": "🚀 Ücretsiz Hesap Oluştur"
     }
 }
 
@@ -59,7 +58,7 @@ with st.sidebar:
     curr = T[lang_choice]
 
 # ==========================================
-# 4. SİSTEM BAĞLANTILARI (GARANTİLİ MODEL BULUCU)
+# 4. SİSTEM BAĞLANTILARI
 # ==========================================
 try:
     supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
@@ -90,40 +89,76 @@ def extract_pdf_text(pdf_file):
     return "".join([page.extract_text() for page in reader.pages])
 
 # ==========================================
-# 5. VİTRİN (LANDING PAGE)
+# 5. VİTRİN (LANDING PAGE - TÜM ÖZELLİKLER BURADA)
 # ==========================================
 def show_landing():
     st.markdown(f"<h1 class='hero-title'>⚡ Quantis AI</h1>", unsafe_allow_html=True)
     st.markdown(f"<p class='hero-sub'><b>{curr['hero']}</b><br>{curr['sub']}</p>", unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        img_file = st.file_uploader(curr["up"], type=['png','jpg','jpeg'])
-        if img_file:
-            st.image(Image.open(img_file), use_container_width=True)
-            if st.button(curr["btn1"]):
-                with st.spinner("Analyzing with Olympiad Reasoning..."):
-                    try:
-                        prompt = f"Give ONLY the final numerical answer or short result. Language: {curr['lang']}."
-                        res = model.generate_content([prompt, Image.open(img_file)])
-                        st.success("Analysis Complete!")
-                        st.markdown(f"<div class='result-card'><h3>Answer: {res.text}</h3></div>", unsafe_allow_html=True)
-                        
-                        st.markdown("""
-                            <div class='blur-box'>
-                                <p><b>Step 1:</b> Defining the variables and applying the foundational theorem...</p>
-                                <p><b>Step 2:</b> Integrating the function over the given boundaries:</p>
-                                <p>$$ \int_{a}^{b} f(x) dx = F(b) - F(a) $$</p>
-                                <p><b>Step 3:</b> Substituting the values yields the final distribution matrix.</p>
-                            </div>
-                        """, unsafe_allow_html=True)
-                        
-                        st.markdown(f"<div class='paywall-box'><h2>{curr['lock']}</h2><p>{curr['lock_sub']}</p></div>", unsafe_allow_html=True)
-                        if st.button(curr["btn2"]):
-                            st.session_state.page = "auth"
-                            st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ AI Error: {e}")
+    # ANA SAYFADA MÜŞTERİYİ İKNA EDECEK 3 SEKME
+    tab1, tab2, tab3 = st.tabs(["📸 Photo Solver", "📄 PDF Exam AI", "🏆 1-on-1 Mentorship"])
+    
+    with tab1:
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            img_file = st.file_uploader(curr["up"], type=['png','jpg','jpeg'], key="landing_img")
+            if img_file:
+                st.image(Image.open(img_file), use_container_width=True)
+                if st.button(curr["btn1"]):
+                    with st.spinner("Analyzing with Olympiad Reasoning..."):
+                        try:
+                            prompt = f"Give ONLY the final numerical answer or short result. Language: {curr['lang']}."
+                            res = model.generate_content([prompt, Image.open(img_file)])
+                            st.success("Analysis Complete!")
+                            st.markdown(f"<div class='result-card'><h3>Answer: {res.text}</h3></div>", unsafe_allow_html=True)
+                            st.markdown("""
+                                <div class='blur-box'>
+                                    <p><b>Step 1:</b> Defining variables and applying the foundational theorem...</p>
+                                    <p><b>Step 2:</b> Integrating over the given boundaries yields the matrix.</p>
+                                </div>
+                            """, unsafe_allow_html=True)
+                            st.markdown(f"<div class='paywall-box'><h2>{curr['lock']}</h2><p>{curr['lock_sub']}</p></div>", unsafe_allow_html=True)
+                            if st.button(curr["btn2"], key="btn_signup_1"):
+                                st.session_state.page = "auth"
+                                st.rerun()
+                        except Exception as e:
+                            st.error(f"❌ AI Error: {e}")
+
+    with tab2:
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            st.info("Upload your lecture notes. AI will extract key formulas, predict exam questions, and generate a mini-test.")
+            pdf_file = st.file_uploader("Upload PDF Notes", type=['pdf'], key="landing_pdf")
+            if pdf_file:
+                st.success("PDF Loaded! Ready for analysis.")
+                if st.button("🧠 Analyze PDF & Predict Exam"):
+                    st.markdown("""
+                        <div class='blur-box'>
+                            <p><b>Summary:</b> The core concept of this chapter relies on thermodynamics...</p>
+                            <p><b>Predicted Question 1:</b> Calculate the entropy change when...</p>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div class='paywall-box'><h2>{curr['lock']}</h2><p>{curr['lock_sub']}</p></div>", unsafe_allow_html=True)
+                    if st.button(curr["btn2"], key="btn_signup_2"):
+                        st.session_state.page = "auth"
+                        st.rerun()
+
+    with tab3:
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            st.markdown("""
+            ### Learn from the Best
+            Your instructor, **Burak**, is a **Top 135 YKS Ranker** and a **TUBITAK Math Olympiad Bronze Medalist**.
+            
+            Get exclusive access to:
+            * Advanced Problem Solving Techniques
+            * Custom Exam Strategy
+            * 1-on-1 Live Sessions
+            """)
+            st.markdown(f"<div class='paywall-box'><h2>{curr['lock']}</h2><p>{curr['lock_sub']}</p></div>", unsafe_allow_html=True)
+            if st.button(curr["btn2"], key="btn_signup_3"):
+                st.session_state.page = "auth"
+                st.rerun()
 
 # ==========================================
 # 6. GİRİŞ VE KAYIT EKRANI
@@ -152,7 +187,7 @@ def show_auth():
                 st.error(f"Error: {e}")
 
 # ==========================================
-# 7. ÇALIŞMA ALANI (DASHBOARD) - TÜM ÖZELLİKLER
+# 7. ÇALIŞMA ALANI (DASHBOARD) - ÜYE GİRİŞİ YAPILDIĞINDA
 # ==========================================
 def show_dashboard():
     user_credits = get_credits(st.session_state.user.id)
@@ -196,7 +231,7 @@ def show_dashboard():
     with tab2:
         st.subheader("AI Exam Predictor")
         st.info("Upload your lecture notes. AI will extract key formulas, predict exam questions, and generate a mini-test.")
-        pdf = st.file_uploader("Upload PDF Notes", type=['pdf'])
+        pdf = st.file_uploader("Upload PDF Notes", type=['pdf'], key="pdf_dash")
         if pdf and st.button("🧠 Analyze PDF (1 Credit)"):
             with st.spinner("Reading document and generating predictions..."):
                 text = extract_pdf_text(pdf)
@@ -214,10 +249,9 @@ def show_dashboard():
         
         Get exclusive access to:
         * Advanced Problem Solving Techniques
-        * Olympiad-level Mathematics
         * Custom Exam Strategy
         """)
-        st.button("Book a Session (Contact Us)")
+        st.button("Book a Session (Contact Support)")
 
 # ==========================================
 # AKIŞ KONTROLÜ
