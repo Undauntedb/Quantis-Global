@@ -5,4 +5,5 @@ sympy
 fpdf
 
 Pillow
-google_generativeai
+google_generativeai>=0.5.0
+
