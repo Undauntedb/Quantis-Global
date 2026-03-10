@@ -7,12 +7,13 @@ import PyPDF2
 # ==========================================
 # 1. TEMEL AYARLAR VE TASARIM
 # ==========================================
-# initial_sidebar_state="expanded" ile sol menünün bilgisayarda hep açık kalmasını sağlıyoruz.
 st.set_page_config(page_title="Quantis AI | Olympiad Level Solver", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
     <style>
-    #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
+    /* HATA BURADAYDI: header etiketini gizlediğim için menü butonu yok oluyordu. Onu sildim! */
+    #MainMenu {visibility: hidden;} 
+    footer {visibility: hidden;} 
     .viewerBadge_container__1QSob {display: none !important;}
     
     .stApp { background-color: #0d1117; color: #c9d1d9; font-family: 'Inter', sans-serif; }
@@ -44,7 +45,7 @@ T = {
 }
 
 # ==========================================
-# 3. SOL MENÜ (SİDEBAR) VE DİL SEÇİMİ (KESİN ÇÖZÜM)
+# 3. SOL MENÜ (SİDEBAR) VE DİL SEÇİMİ
 # ==========================================
 with st.sidebar:
     st.markdown("### 🌐 Settings / Ayarlar")
@@ -199,7 +200,6 @@ def show_auth():
 def show_dashboard():
     st.markdown(f"<h1 class='hero-title'>{curr['dash']}</h1>", unsafe_allow_html=True)
     
-    # Kullanıcı kredisini get_credits ile sidebar tarafında çektik, tekrar kullanıyoruz
     user_credits = get_credits(st.session_state.user.id)
     
     if user_credits <= 0:
