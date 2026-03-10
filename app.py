@@ -12,7 +12,7 @@ st.set_page_config(page_title="Quantis Global | Universal Engineering", page_ico
 # Secrets'tan API Key Al
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
 except:
     st.error("API Key not found in Secrets!")
 
@@ -63,3 +63,4 @@ with tab2:
                 st.markdown("<div class='result-card'>", unsafe_allow_html=True)
                 st.markdown(response.text)
                 st.markdown("</div>", unsafe_allow_html=True)
+
