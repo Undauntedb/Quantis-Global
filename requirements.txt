@@ -3,3 +3,4 @@ Pillow
 google-generativeai
 supabase
 PyPDF2
+
