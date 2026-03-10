@@ -6,5 +6,6 @@ fpdf
 
 Pillow
 google_generativeai
+supabase
 
 
